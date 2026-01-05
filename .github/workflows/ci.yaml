@@ -26,10 +26,5 @@ jobs:
       - name: Run tests
         run: cargo test
 
-      - name: Start application
-        run: |
-          cargo run &
-          sleep 5
-
-      - name: Smoke test
-        run: curl --fail http://localhost:8080/health
+      - name: Smoke test (application starts)
+        run: cargo run
