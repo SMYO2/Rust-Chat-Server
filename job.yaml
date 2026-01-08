@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rustserver-rust-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: rustserver-rust
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: rustserver-rust
+        image: semyo/rustserver-rust:latest
