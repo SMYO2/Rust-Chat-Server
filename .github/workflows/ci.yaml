@@ -4,7 +4,6 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -25,6 +24,30 @@ jobs:
 
       - name: Run tests
         run: cargo test
+  
+  build-and-push:
+    needs: build
+    runs-on: ubuntu-latest
 
-      - name: Smoke test (application starts)
-        run: timeout 10 cargo run --bin server || true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Build Docker image met username
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/rustserver-rust:latest .
+
+      # Log in bij Docker Hub via secrets
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Push Docker image naar Docker Hub
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/rustserver-rust:latest
+
+      # Optioneel: Run container voor smoke test
+      - name: Run container (smoke test)
+        run: docker run --rm ${{ secrets.DOCKER_USERNAME }}/rustserver-rust:latest
